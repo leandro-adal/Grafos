@@ -1,2 +1,2 @@
-# tg-ufal
-Códigos usados durante minha graduação na UFAL com a disciplina de Teoria dos Grafos 
+# TG-ufal
+Expandindo a implentação dos códigos utilizados nas aulas da disciplina de Teoria dos Grafos durante minha graduação na UFAL
