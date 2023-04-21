@@ -30,7 +30,10 @@ class Grafo:
         self.matriz[vj][vi] = 0
 
     def existe_aresta(self, vi, vj):
-        return self.matriz[vi][vj] > 0
+        try:
+            return self.matriz[vi][vj] > 0
+        except IndexError:
+            return False
 
     # Quantidade de aresta que incidem no vertice
     def get_grau_vertice(self, vertice):
@@ -81,7 +84,7 @@ class Grafo:
             if not visitados[v]:
                 self.dfs(v, visitados)  # O torna visitado
 
-    # Um grafo simples com n vertices em que to-do vertice é adjacente a todos os outros vertices
+    # Um grafo simples com n_vertices vertices em que to-do vertice é adjacente a todos os outros vertices
     def eh_completo(self):
         for i in range(self.n_vertices):
             for j in range(i + 1, self.n_vertices):
@@ -115,3 +118,20 @@ class Grafo:
 
     def eh_isomorfo(self, grafo):
         pass
+
+
+g = Grafo(7)
+g.criar_aresta(0, 1, 5)
+g.criar_aresta(0, 1, 9)
+g.criar_aresta(1, 2, 8)
+g.criar_aresta(2, 3, 7)
+g.criar_aresta(3, 4, 6)
+g.criar_aresta(4, 5, 5)
+g.criar_aresta(0, 4, 4)
+g.criar_aresta(1, 3, 3)
+
+print(g)
+print(g.bipartido())
+print(g.existe_aresta(4, 7))
+print(g.adjacentes(4))
+print(g.eh_conexo())

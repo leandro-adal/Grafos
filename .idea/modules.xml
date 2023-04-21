@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/TG-ufal.iml" filepath="$PROJECT_DIR$/.idea/TG-ufal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Grafos/.idea/Grafos.iml" filepath="$PROJECT_DIR$/../Grafos/.idea/Grafos.iml" />
     </modules>
   </component>
 </project>
