@@ -36,11 +36,17 @@ class Multigrafo:  # grafo não dirigido
 
     # remover
     def remover_aresta(self, vi, vj, peso=1):
-        if self.existe_aresta(vi, vj) and peso in self.matriz_ponderada[vj][vi][1]:
-            self.matriz_ponderada[vi][vj][0] -= 1
-            self.matriz_ponderada[vj][vi][0] -= 1
-            self.matriz_ponderada[vi][vj][1].remove(peso)
-            self.matriz_ponderada[vj][vi][1].remove(peso)
+        try:
+            pesos_aresta = self.matriz_ponderada[vj][vi][1]
+            if self.existe_aresta(vi, vj) and peso in pesos_aresta:
+                self.matriz_ponderada[vi][vj][0] -= 1
+                self.matriz_ponderada[vj][vi][0] -= 1
+                self.matriz_ponderada[vi][vj][1].remove(peso)
+                self.matriz_ponderada[vj][vi][1].remove(peso)
+            else:
+                print(f'Não existe uma aresta entre {vi} e {vj} com o peso: {peso}')
+        except IndexError:
+            print(f'Não existe aresta entre os vertices{vi} e {vj}')
 
     # existe
     def existe_aresta(self, vi, vj):
@@ -130,3 +136,24 @@ class Multigrafo:  # grafo não dirigido
 
     def eh_isomorfo(self, grafo):
         pass
+
+
+g = Multigrafo(7)
+g.criar_aresta(0, 1, 5)
+g.criar_aresta(0, 1, 9)
+g.criar_aresta(1, 2, 8)
+g.criar_aresta(2, 3, 7)
+g.criar_aresta(3, 4, 6)
+g.criar_aresta(4, 5, 5)
+g.criar_aresta(0, 4, 4)
+g.criar_aresta(1, 3, 3)
+g.criar_aresta(1, 6, 3)
+g.remover_aresta(1, 6, 2)
+g.remover_aresta(1, 7, 2)
+
+print(g)
+print(g.bipartido())
+print(g.print_pesos())
+print(g.existe_aresta(4, 7))
+print(g.adjacentes(4))
+print(g.eh_conexo())
