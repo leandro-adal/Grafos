@@ -46,7 +46,7 @@ class Multigrafo:  # grafo não dirigido
             else:
                 print(f'Não existe uma aresta entre {vi} e {vj} com o peso: {peso}')
         except IndexError:
-            print(f'Não existe aresta entre os vertices{vi} e {vj}')
+            print(f'Não existe aresta entre os vertices {vi} e {vj}')
 
     # existe
     def existe_aresta(self, vi, vj):
@@ -126,7 +126,7 @@ class Multigrafo:  # grafo não dirigido
         print(cor)
         for i in range(n - 1):
             for j in range(i + 1, n):
-                if self.matriz_ponderada[i][j][0] == 1:  # te aresta entre vi e vj
+                if self.existe_aresta(i, j):  # tem aresta entre vi e vj
                     print(cor)
                     if cor[i] == cor[j]:
                         return False
@@ -136,24 +136,3 @@ class Multigrafo:  # grafo não dirigido
 
     def eh_isomorfo(self, grafo):
         pass
-
-
-g = Multigrafo(7)
-g.criar_aresta(0, 1, 5)
-g.criar_aresta(0, 1, 9)
-g.criar_aresta(1, 2, 8)
-g.criar_aresta(2, 3, 7)
-g.criar_aresta(3, 4, 6)
-g.criar_aresta(4, 5, 5)
-g.criar_aresta(0, 4, 4)
-g.criar_aresta(1, 3, 3)
-g.criar_aresta(1, 6, 3)
-g.remover_aresta(1, 6, 2)
-g.remover_aresta(1, 7, 2)
-
-print(g)
-print(g.bipartido())
-print(g.print_pesos())
-print(g.existe_aresta(4, 7))
-print(g.adjacentes(4))
-print(g.eh_conexo())
