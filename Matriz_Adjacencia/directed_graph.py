@@ -38,18 +38,18 @@ class DirectedGraph:  # sem arestas paralelas e pode ter laços
             return False
 
     # grauVertice
-    def get_vertex_degree(self, vertice):
-        grau = 0
+    def get_vertex_degree(self, vertex):
+        degree = 0
         for v in range(self.n_vertices):
-            grau += self.matrix[v][vertice]
-        return grau
+            degree += self.matrix[v][vertex]
+        return degree
 
     # grauGrafo
     def get_graph_degree(self):
-        grau = 0
+        degree = 0
         for v in range(self.n_vertices):
-            grau += self.get_vertex_degree(v)
-        return grau
+            degree += self.get_vertex_degree(v)
+        return degree
 
     # temLoop
     def has_loop(self):
