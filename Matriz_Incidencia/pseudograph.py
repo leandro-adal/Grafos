@@ -1,109 +1,182 @@
-class Grafo:
-    n_arestas = 0
+class PseudoGraph:
+    n_edges = 0
     m_vertices = 0
-    matriz = 0
+    matrix = 0
+    weights = []
 
-    def __init__(self, m_vertices, n_arestas):
-        self.n_arestas = n_arestas
+    def __init__(self, m_vertices, n_edges):
+        self.n_edges = n_edges
         self.m_vertices = m_vertices
-        self.matriz = [[0 for i in range(n_arestas)] for j in range(m_vertices)]
+        self.matrix = [[0 for i in range(n_edges)] for j in range(m_vertices)]
+        self.weights = [0 for i in range(n_edges)]
 
     def __str__(self):
         graph = ''
         for i in range(self.m_vertices):
-            for j in range(self.n_arestas):
-                graph += str(self.matriz[i][j]) + ' '
+            for j in range(self.n_edges):
+                graph += f'{str(self.matrix[i][j])} '
             graph += '\n'
         return graph
 
-    def criar_aresta(self, vi, vj, aresta):
-        self.matriz[vi][aresta] += 1
-        self.matriz[vj][aresta] += 1
+    def new_edge(self, vi, vj, edge, weight=0):
+        self.matrix[vi][edge] += 1
+        self.matrix[vj][edge] += 1
+        self.weights[edge] = weight
 
-    def remover_aresta(self, vi, vj, aresta):
-        self.matriz[vi][aresta] -= 1
-        self.matriz[vj][aresta] -= 1
+    def remove_edge(self, vi, vj, edge):
+        self.matrix[vi][edge] -= 1
+        self.matrix[vj][edge] -= 1
+        self.weights[edge] = 0
 
-    def existe_aresta(self, vi, vj, aresta):  #
-        return self.matriz[vi][aresta] != 0 and self.matriz[vj][aresta] != 0
+    # verifica se existe aresta entre 2 vertices
+    def exist_edge(self, vi, vj, edge):  # i
+        return self.matrix[vi][edge] != 0 and self.matrix[vj][edge] != 0
 
-    def getAresta(self, vi, vj):  # verifica se existe aresta entre 2 vertices e se houver a retorna
-        for aresta in range(self.n_arestas):
-            if self.existe_aresta(vi, vj, aresta):
-                return aresta
+    # verifica se existe aresta entre 2 vertices se existir a retorna
+    def get_edge(self, vi, vj):
+        for edge in range(self.n_edges):
+            if self.exist_edge(vi, vj, edge):
+                return edge
         return -1
 
-    def getGrauVertice(self, vertice):
-        grau = 0
-        for aresta in range(self.n_arestas):
-            grau += self.matriz[vertice][aresta]
-        return grau
+    def get_vertex_degree(self, vertex):
+        degree = 0
+        for edge in range(self.n_edges):
+            degree += self.matrix[vertex][edge]
+        return degree
 
-    def getGrauGrafo(self):
-        grau = 0
+    def get_graph_degree(self):
+        degree = 0
         for v in range(self.m_vertices):
-            grau += self.getGrauVertice(v)
-        return grau
+            degree += self.get_vertex_degree(v)
+        return degree
 
-    def temLoop(self):  # Se algum vertice tiver valor maior que 2
-        for v in range(self.m_vertices):
-            for aresta in range(self.n_arestas):
-                if self.matriz[v][aresta] > 1:
+    def has_loop(self):  # Se algum vertice tiver valor maior que 1
+        for vertex in range(self.m_vertices):
+            for edge in range(self.n_edges):
+                if self.matrix[vertex][edge] > 1:
                     return True
         return False
 
-    def temArestasParalelas(self):  # Se os mesmo vertice forem conectados mais de uma vez
-        for i in range(self.m_vertices):
-            for j in range(i + 1, self.m_vertices):
-                qt_arestas_conectando = 0
-                for aresta in range(self.n_arestas):
-                    if self.matriz[i][aresta] > 0 and self.matriz[j][aresta] > 0:
-                        # Se o vertice anterior e o atual forem maiores que 1 eles são conectados
-                        qt_arestas_conectando += 1
-                if qt_arestas_conectando > 1:  # se for maior tem arestas paralelas
+    def has_parallel_edges(self):  # Se os mesmo vertice forem conectados mais de uma vez
+        for vi in range(self.m_vertices):
+            for vj in range(vi + 1, self.m_vertices):
+                edges_connecting = 0
+                # Percorre as arestas, pois caso hajam paralelas elas estarão na mesma posição 'vi' e 'vj'
+                for edge in range(self.n_edges):
+                    # Se o vertice anterior e o atual forem maiores que 0 eles estão conectados
+                    if self.matrix[vi][edge] > 0 and self.matrix[vj][edge] > 0:
+                        edges_connecting += 1
+                # se as arestas conectadas for maior que 1 existe arestas paralelas
+                if edges_connecting > 1:
                     return True
         return False
 
-    def vertices_conectados(self, aresta):  # Lista todos os vertices em que a aresta incide
+    def modify_edge_weight(self, edge, new_weight):
+        self.weights[edge] = new_weight
+
+    def get_weight_edge(self, edge):
+        return self.weights[edge]
+
+    # Lista todos os vertices que a aresta passa
+    def connected_by_edges(self, edge):
         vertices = []
         for i in range(self.m_vertices):
-            for j in range(self.n_arestas):
-                if self.matriz[i][j] != 0 and j == aresta:
+            for j in range(self.n_edges):
+                # uma aresta so conecta 2 vertices então não precisa percorrer a lista inteira
+                if len(vertices) > 2:
+                    break
+                elif self.matrix[i][j] != 0 and j == edge:
                     vertices.append(i)
         return vertices
 
-    def e_completo(self):  # todo vertice é adjacente
-        for i in range(self.m_vertices):
-            for j in range(self.m_vertices):
-                if i != j and not self.existe_aresta(i, j, self.getAresta(i, j)):
-                    return False
-        return True
+    def is_bipartite(self):
+        if self.is_connected():
+            n_vertices = self.m_vertices
+            colors = [-1] * n_vertices  # Inicializa todas as colors como -1
+            row = []  # fila
+            for i in range(n_vertices):
+                if colors[i] == -1:
+                    colors[i] = 0
+                    row.append(i)
+                    while row:
+                        v = row.pop(0)
+                        for adj in self.get_adjacent(v):
+                            if colors[adj] == -1:
+                                colors[adj] = 1 - colors[v]  # Atribui uma cor oposta à do vértice atual
+                                row.append(adj)
+                            elif colors[adj] == colors[v]:
+                                return False
+            return True
 
-    def getAdjacentes(self, v):
-        adjacentes = []
-        for aresta in range(self.n_arestas):
-            if self.matriz[v][aresta] != 0:
-                for i in range(self.m_vertices):
-                    if i != v and self.matriz[i][aresta] != 0:
-                        adjacentes.append(i)
-        return adjacentes
+        else:
+            return False
 
-    # grafo regular - Se todos os vertices tem o mesmo grau
-    def eh_regular(self):
-        grau = self.getGrauVertice(0)
-        for v in range(1, self.m_vertices):
-            if self.getGrauVertice(v) != grau:
+    def is_connected(self):
+        n = self.m_vertices
+        visited = [False] * n
+        self.deep_search(0, visited)
+        for i in range(n):
+            if not visited[i]:
                 return False
         return True
 
-    def e_simples(self):  # i
-        if self.temLoop() or self.temArestasParalelas():
+    def deep_search(self, vertex, visited):
+        visited[vertex] = True
+        for vi in range(self.m_vertices):
+            if self.matrix[vertex][vi] != 0 and not visited[vi]:
+                self.deep_search(vi, visited)
+
+    def is_complete(self):  # to-do vertice é adjacente
+        for vi in range(self.m_vertices):
+            for vj in range(self.m_vertices):
+                if vi != vj and not self.exist_edge(vi, vj, self.get_edge(vi, vj)):
+                    return False
+        return True
+
+    def get_adjacent(self, vertex):
+        adjacent = []
+        for edge in range(self.n_edges):
+            if self.matrix[vertex][edge] != 0:
+                for vi in range(self.m_vertices):
+                    if vi != vertex and self.matrix[vi][edge] != 0:
+                        adjacent.append(vi)
+        return adjacent
+
+    def is_subgraph(self, graph):
+        # Verifica se os vértices do grafo menor também existem no grafo maior
+        for i in range(graph.m_vertices):
+            if i not in range(self.m_vertices):
+                return False
+
+        # Verifica se as arestas do grafo menor também existem no grafo maior
+        for i in range(graph.m_vertices):
+            for j in graph.get_adjacent(i):
+                if not self.exist_edge(i, j, graph.get_edge(i, j)):
+                    return False
+
+        return True
+
+    def is_simple(self):  # i
+        if self.has_loop() or self.has_parallel_edges():
             return False
         else:
             return True
 
-    def e_pseudografo(self):
-        return self.temLoop() and self.temArestasParalelas()
+    def is_pseudograph(self):
+        return self.has_loop() or self.has_parallel_edges()
 
-    def e_multigrafo(self):
-        return self.temArestasParalelas and not self.temLoop()
+    # se é um grafo com pesos nas arestas
+    def is_weighted(self):
+        for i in range(len(self.weights)):
+            if self.weights[i] != 0:
+                return True
+        return False
+
+    # grafo regular - Se todos os vertices tem o mesmo grau
+    def is_regular(self):
+        degree = self.get_vertex_degree(0)
+        for v in range(1, self.m_vertices):
+            if self.get_vertex_degree(v) != degree:
+                return False
+        return True
